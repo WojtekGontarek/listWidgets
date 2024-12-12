@@ -14,6 +14,7 @@ class MyForm(QDialog):
         self.ui.studentLW.itemClicked.connect(self.student_change)
         self.ui.auStudentLW.itemClicked.connect(self.august_change)
         self.ui.acceptButton.clicked.connect(self.save_clicked)
+        self.ui.dodajButton.clicked.connect(self.add_student)
         self.load()
         self.show()
 
@@ -50,6 +51,24 @@ class MyForm(QDialog):
             self.ui.studentLW.clear()
             self.ui.studentLW.addItems(students)
             self.ui.auStudentLW.addItems(au_students)
+
+            for item in students:
+                self.ui.removeStudentCBox.addItem(item)
+
+            self.update_students()
+
+    def update_students(self):
+        students = [self.ui.studentLW.item(i).text() for i in range(self.ui.studentLW.count())]
+        au_students = [self.ui.auStudentLW.item(i).text() for i in range(self.ui.auStudentLW.count())]
+
+        self.ui.removeStudentCBox.clear()
+        for student in students + au_students:
+            self.ui.removeStudentCBox.addItem(student)
+
+    def add_student(self):
+        student = self.ui.addStudent.text()
+        self.ui.studentLW.addItem(student)
+        self.update_students()
 
 
 if __name__ == "__main__":
