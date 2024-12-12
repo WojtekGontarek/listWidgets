@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 from PyQt6.QtWidgets import QDialog, QApplication
 
 from layout import Ui_Dialog
@@ -8,13 +11,48 @@ class MyForm(QDialog):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.ui.studentLW.itemChanged.connect(self.student_change)
+        self.ui.studentLW.itemClicked.connect(self.student_change)
+        self.ui.auStudentLW.itemClicked.connect(self.august_change)
+        self.ui.acceptButton.clicked.connect(self.save_clicked)
+        self.load()
         self.show()
 
     def student_change(self):
-        print("student changed")
+        # students = self.ui.studentLW.selectedItems()
+        # for student in students:
+        #     self.ui.auStudentLW.addItem(student.text())
+
+        student = self.ui.studentLW.takeItem(self.ui.studentLW.currentRow())
+        self.ui.auStudentLW.addItem(student.text())
+
+    def august_change(self):
+        student = self.ui.auStudentLW.takeItem(self.ui.auStudentLW.currentRow())
+        self.ui.studentLW.addItem(student.text())
+
+    def save_clicked(self):
+        file = open("wyrok.txt", "w")
+        for index in range(self.ui.auStudentLW.count()):
+            file.write(self.ui.auStudentLW.item(index).text() + "\n")
+        file.close()
+
+        file = open("bezpieczni.txt", "w")
+        for index in range(self.ui.studentLW.count()):
+            file.write(self.ui.studentLW.item(index).text() + "\n")
+        file.close()
+
+    def load(self):
+        if Path("./wyrok.txt").exists() and Path("./bezpieczni.txt").exists():
+            with open("wyrok.txt", "r") as file:
+                au_students = file.read().splitlines()
+            with open("bezpieczni.txt", "r") as file:
+                students = file.read().splitlines()
+
+            self.ui.studentLW.clear()
+            self.ui.studentLW.addItems(students)
+            self.ui.auStudentLW.addItems(au_students)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MyForm()
-    window.show()
+    ex = MyForm()
+    sys.exit(app.exec())
